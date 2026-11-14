@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petualangan Tata Surya Minecraft - IPAS Kelas 5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        .pixel-font {
+            font-family: 'Press Start 2P', monospace;
+        }
+        .pixel-box {
+            box-shadow: 4px 4px 0px #000000;
+            border: 3px solid #334155;
+        }
+        .pixel-button {
+            box-shadow: 0px 4px 0px #1e293b, 0px 6px 0px #0f172a;
+            transition: all 0.1s ease;
+        }
+        .pixel-button:active {
+            transform: translateY(4px);
+            box-shadow: 0px 0px 0px #1e293b;
+        }
+        /* Custom Minecraft-like scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border: 2px solid #1e293b;
+        }
+        .starfield {
+            background-image: radial-gradient(white 1px, transparent 0);
+            background-size: 50px 50px;
+        }
+    </style>
+</head>
+<body class="starfield min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+
+    <!-- Top Navigation / Header -->
+    <header class="bg-slate-900/90 border-b-4 border-slate-700 p-4 sticky top-0 z-50 backdrop-blur">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-emerald-600 pixel-box flex items-center justify-center text-2xl font-bold text-white shadow-lg animate-bounce">
+                    🚀
+                </div>
+                <div>
+                    <h1 class="pixel-font text-xs sm:text-sm text-emerald-400 tracking-wider">CRAFTING SPACE</h1>
+                    <p class="text-xs text-slate-400">IPAS Kelas 5 • Materi Tata Surya</p>
+                </div>
+            </div>
+            
+            <!-- Global Stats Bar -->
+            <div class="flex items-center gap-4 bg-slate-800 px-4 py-2 pixel-box">
+                <div class="flex items-center gap-1 text-yellow-400 font-bold text-sm">
+                    ⭐ <span id="scoreDisplay">0</span>
+                </div>
+                <div class="w-px h-6 bg-slate-600"></div>
+                <div class="flex items-center gap-1 text-red-400 font-bold text-sm">
+                    ❤️ <span id="livesDisplay">3</span>
+                </div>
+                <div class="w-px h-6 bg-slate-600"></div>
+                <button onclick="toggleAudio()" id="soundToggle" class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-2 py-1 pixel-button">
+                    🔊 Audio: ON
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container / Screen Router -->
+    <main class="max-w-5xl w-full mx-auto p-4 sm:p-6 my-auto flex-grow flex flex-col justify-center">
+
+        <!-- SCREEN 1: MAIN MENU -->
+        <div id="screenMenu" class="space-y-6 text-center">
+            <div class="bg-slate-800/90 p-6 sm:p-10 pixel-box max-w-2xl mx-auto relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl">🪐</div>
+                <h2 class="pixel-font text-emerald-400 text-lg sm:text-2xl mb-4 leading-relaxed">
+                    PENJELAJAH TATA SURYA PIXEL
+                </h2>
+                <p class="text-slate-300 text-sm sm:text-base mb-6 leading-relaxed">
+                    Halo, Astronot Steve! Mari berpetualang menjelajahi planet-planet di tata surya, menguji pengetahuanmu lewat kuis menantang, dan menyusun orbit planet!
+                </p>
+
+                <div class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+                    <button onclick="switchScreen('screenExploration')" class="pixel-button bg-emerald-600 hover:bg-emerald-500 text-white pixel-font text-xs py-4 px-6 rounded-none flex items-center justify-center gap-2">
+                        🪐 Eksplorasi Planet
+                    </button>
+                    <button onclick="startQuiz()" class="pixel-button bg-amber-600 hover:bg-amber-500 text-white pixel-font text-xs py-4 px-6 rounded-none flex items-center justify-center gap-2">
+                        ❓ Kuis Misi Angkasa
+                    </button>
+                    <button onclick="startMiniGame()" class="pixel-button bg-indigo-600 hover:bg-indigo-500 text-white pixel-font text-xs py-4 px-6 rounded-none flex items-center justify-center gap-2">
+                        🧩 Susun Orbit
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Tips Box -->
+            <div class="bg-slate-900/80 p-4 pixel-box max-w-2xl mx-auto text-left text-xs text-slate-400 flex items-start gap-3">
+                <span class="text-xl">💡</span>
+                <p><strong>Tips IPAS:</strong> Tata surya kita terdiri dari Matahari sebagai pusat dan 8 planet yang mengitarinya pada jalur orbit berbentuk elips. Mari pelajari karakteristik unik masing-masing!</p>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: PLANET EXPLORATION -->
+        <div id="screenExploration" class="hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <button onclick="switchScreen('screenMenu')" class="pixel-button bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 pixel-font">
+                    ⬅️ KEMBALI
+                </button>
+                <h2 class="pixel-font text-emerald-400 text-sm sm:text-lg text-center">MODE EKSPLORASI PLANET</h2>
+                <div class="w-20"></div>
+            </div>
+
+            <!-- Planet Selector Bar -->
+            <div class="grid grid-cols-4 sm:grid-cols-9 gap-2 bg-slate-800 p-3 pixel-box overflow-x-auto">
+                <!-- Planets buttons generated or static -->
+                <button onclick="selectPlanet(0)" class="planet-btn p-2 text-center bg-slate-700 hover:bg-slate-600 pixel-button text-xs font-bold text-amber-200">Merkurius</button>
+                <button onclick="selectPlanet(1)" class="planet-btn p-2 text-center bg-slate-700 hover:bg-slate-600 pixel-button text-xs font-bold text-orange-300">Venus</button>
+                <button onclick="selectPlanet(2)" class="planet-btn p-2 text-center bg-slate-700 hover:bg-slate-600 pixel-button text-xs font-bold text-blue-400">Bumi</button>
+                <button onclick="selectPlanet(3)" class="planet-btn p-2 text-center bg-slate-700 hover:bg-slate-600 pixel-button text-xs font-bold text-red-400">Mars</button>
+                <button onclick="selectPlanet(4)" class="planet-btn p-2 text-center bg-slate-700 hover:bg-slate-600 pixel-button text-xs font-bold text-amber-600">Yupiter</button>
+                <button onclick="selectPlanet(5)" class="planet-btn p-2 text-center bg-slate-700 hover:bg-slate-600 pixel-button text-xs font-bold text-yellow-200">Saturnus</button>
+                <button onclick="selectPlanet(6)" class="planet-btn p-2 text-center bg-slate-700 hover:bg-slate-600 pixel-button text-xs font-bold text-cyan-300">Uranus</button>
+                <button onclick="selectPlanet(7)" class="planet-btn p-2 text-center bg-slate-700 hover:bg-slate-600 pixel-button text-xs font-bold text-blue-600">Neptunus</button>
+                <button onclick="selectPlanet(8)" class="planet-btn p-2 text-center bg-slate-700 hover:bg-slate-600 pixel-button text-xs font-bold text-yellow-500">Matahari</button>
+            </div>
+
+            <!-- Planet Detail Card -->
+            <div class="bg-slate-800/90 p-6 sm:p-8 pixel-box grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                <div class="flex flex-col items-center justify-center bg-slate-900 p-6 pixel-box">
+                    <div id="planetVisual" class="text-7xl mb-4 animate-pulse">🪐</div>
+                    <h3 id="planetTitle" class="pixel-font text-emerald-400 text-sm text-center">Pilih Planet</h3>
+                    <span id="planetType" class="text-xs bg-slate-800 text-slate-300 px-2 py-1 mt-2 border border-slate-700"></span>
+                </div>
+                
+                <div class="md:col-span-2 space-y-4">
+                    <div>
+                        <h4 class="text-xs pixel-font text-amber-400 mb-1">FAKTA UTAMA IPAS:</h4>
+                        <p id="planetDesc" class="text-slate-200 text-sm leading-relaxed">Klik salah satu tombol planet di atas untuk mulai mempelajari karakteristik tata surya ala Minecraft!</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 pt-2 border-t border-slate-700 text-xs">
+                        <div class="bg-slate-900/50 p-3 pixel-box">
+                            <span class="text-slate-400 block mb-1">Jarak dari Matahari:</span>
+                            <span id="planetDistance" class="font-bold text-cyan-300">-</span>
+                        </div>
+                        <div class="bg-slate-900/50 p-3 pixel-box">
+                            <span class="text-slate-400 block mb-1">Karakteristik Unik:</span>
+                            <span id="planetFeature" class="font-bold text-emerald-300">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: QUIZ MISSION -->
+        <div id="screenQuiz" class="hidden space-y-6 max-w-2xl mx-auto w-full">
+            <div class="flex justify-between items-center">
+                <button onclick="switchScreen('screenMenu')" class="pixel-button bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 pixel-font">
+                    ⬅️ KELUAR
+                </button>
+                <h2 class="pixel-font text-amber-400 text-sm text-center">MISI KUIS ANGKASA</h2>
+                <div class="text-xs font-bold text-slate-400">Soal <span id="currentQuestionNum">1</span>/5</div>
+            </div>
+
+            <div class="bg-slate-800/90 p-6 sm:p-8 pixel-box space-y-6">
+                <div class="bg-slate-900 p-4 pixel-box border-l-4 border-amber-500">
+                    <p id="quizQuestionText" class="text-slate-100 text-sm sm:text-base leading-relaxed font-semibold">
+                        Memuat pertanyaan...
+                    </p>
+                </div>
+
+                <div id="quizOptionsContainer" class="grid grid-cols-1 gap-3">
+                    <!-- Options injected via JS -->
+                </div>
+
+                <div id="quizFeedback" class="hidden p-3 text-xs font-bold text-center pixel-box"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: MINI-GAME ORBIT -->
+        <div id="screenMiniGame" class="hidden space-y-6 max-w-2xl mx-auto w-full">
+            <div class="flex justify-between items-center">
+                <button onclick="switchScreen('screenMenu')" class="pixel-button bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 pixel-font">
+                    ⬅️ KELUAR
+                </button>
+                <h2 class="pixel-font text-indigo-400 text-sm text-center">MINI-GAME: SUSUN ORBIT</h2>
+                <div class="w-20"></div>
+            </div>
+
+            <div class="bg-slate-800/90 p-6 pixel-box space-y-4">
+                <p class="text-xs text-slate-300 text-center">
+                    Seret atau pindahkan planet sesuai urutan jarak terdekat ke Matahari di urutan atas hingga bawah!
+                </p>
+
+                <div id="orbitList" class="space-y-2">
+                    <!-- Draggable / Clickable items -->
+                </div>
+
+                <div class="text-center pt-4">
+                    <button onclick="checkOrbitOrder()" class="pixel-button bg-indigo-600 hover:bg-indigo-500 text-white pixel-font text-xs py-3 px-6">
+                        ✨ Periksa Urutan Orbit
+                    </button>
+                </div>
+                <div id="orbitFeedback" class="hidden text-xs text-center font-bold p-2"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: GAME OVER / VICTORY MODAL -->
+        <div id="screenResult" class="hidden space-y-6 max-w-lg mx-auto w-full text-center">
+            <div class="bg-slate-800 p-8 pixel-box space-y-4">
+                <div id="resultEmoji" class="text-6xl animate-bounce">🏆</div>
+                <h2 id="resultTitle" class="pixel-font text-emerald-400 text-lg">MISI SELESAI!</h2>
+                <p id="resultDesc" class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                    Hebat! Kamu telah menuntaskan misi penjelajahan tata surya ala Minecraft.
+                </p>
+                <div class="bg-slate-900 p-4 pixel-box text-xs text-amber-300 font-bold">
+                    Skor Akhir Kamu: <span id="finalScore">0</span> Bintang
+                </div>
+                <div class="pt-4 flex justify-center gap-4">
+                    <button onclick="switchScreen('screenMenu')" class="pixel-button bg-emerald-600 hover:bg-emerald-500 text-white pixel-font text-xs py-3 px-6">
+                        🏠 Menu Utama
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 border-t-2 border-slate-800 py-3 text-center text-xs text-slate-500">
+        <p>Game Edukasi IPAS Kelas 5 • Dibuat dengan tema Minecraft Pixel Art 🌟</p>
+    </footer>
+
+    <!-- Audio & Game Script -->
+    <script>
+        // --- AUDIO SYNTHESIZER (Web Audio API) ---
+        let audioEnabled = true;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (!audioEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'click') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                osc.start(now);
+                osc.stop(now + 0.08);
+            } else if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.25);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            }
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            document.getElementById('soundToggle').innerText = audioEnabled ? '🔊 Audio: ON' : '🔇 Audio: OFF';
+            playSound('click');
+        }
+
+        // --- GLOBAL GAME STATE ---
+        let score = 0;
+        let lives = 3;
+
+        function updateHUD() {
+            document.getElementById('scoreDisplay').innerText = score;
+            document.getElementById('livesDisplay').innerText = lives;
+        }
+
+        function switchScreen(screenId) {
+            playSound('click');
+            const screens = ['screenMenu', 'screenExploration', 'screenQuiz', 'screenMiniGame', 'screenResult'];
+            screens.forEach(s => {
+                document.getElementById(s).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        // --- PLANET EXPLORATION DATA ---
+        const planetsData = [
+            {
+                name: "Merkurius",
+                type: "Planet Terdekat & Kebumian",
+                distance: "57,9 juta km",
+                feature: "Planet paling kecil dan tidak memiliki atmosfer, sehingga suhunya sangat ekstrim!",
+                visual: "🌑"
+            },
+            {
+                name: "Venus",
+                type: "Planet Terpanas",
+                distance: "108,2 juta km",
+                feature: "Dikenal sebagai Bintang Kejora dan memiliki efek rumah kaca super kuat yang membuat permukaannya sangat panas.",
+                visual: "🌕"
+            },
+            {
+                name: "Bumi",
+                type: "Planet Tempat Tinggal Kita",
+                distance: "149,6 juta km",
+                feature: "Satu-satunya planet yang diketahui memiliki kehidupan, air cair, dan atmosfer kaya oksigen.",
+                visual: "🌍"
+            },
+            {
+                name: "Mars",
+                type: "Planet Merah",
+                distance: "227,9 juta km",
+                feature: "Memiliki permukaan berdebu besi oksida (karat) berwarna kemerahan dan gunung tertinggi bernama Olympus Mons.",
+                visual: "🔴"
+            },
+            {
+                name: "Yupiter",
+                type: "Planet Raksasa Gas",
+                distance: "778,5 juta km",
+                feature: "Planet terbesar di tata surya dengan badai raksasa abadi yang disebut Bintik Merah Raksasa.",
+                visual: "🟠"
+            },
+            {
+                name: "Saturnus",
+                type: "Planet Berpendar Cincin",
+                distance: "1,43 miliar km",
+                feature: "Terkenal dengan sistem cincin megah yang terbuat dari bongkahan es dan batuan.",
+                visual: "🪐"
+            },
+            {
+                name: "Uranus",
+                type: "Planet Raksasa Es",
+                distance: "2,87 miliar km",
+                feature: "Planet unik yang berotasi menggelinding miring ke samping dengan suhu terdingin.",
+                visual: "🔵"
+            },
+            {
+                name: "Neptunus",
+                type: "Planet Angin Terkencang",
+                distance: "4,50 miliar km",
+                feature: "Planet biru terluar dengan badai angin paling dahsyat di tata surya.",
+                visual: "🌀"
+            },
+            {
+                name: "Matahari",
+                type: "Bintang Pusat Tata Surya",
+                distance: "Pusat",
+                feature: "Bukan planet, melainkan bintang raksasa yang menjadi sumber cahaya dan gravitasi utama.",
+                visual: "☀️"
+            }
+        ];
+
+        function selectPlanet(index) {
+            playSound('click');
+            const p = planetsData[index];
+            document.getElementById('planetTitle').innerText = p.name;
+            document.getElementById('planetType').innerText = p.type;
+            document.getElementById('planetDesc').innerText = p.feature;
+            document.getElementById('planetDistance').innerText = p.distance;
+            document.getElementById('planetFeature').innerText = p.feature.substring(0, 50) + "...";
+            document.getElementById('planetVisual').innerText = p.visual;
+        }
+
+        // Initialize default planet view
+        selectPlanet(2);
+
+        // --- QUIZ MISSION LOGIC ---
+        const quizQuestions = [
+            {
+                q: "Planet manakah yang letaknya paling dekat dengan Matahari di tata surya kita?",
+                options: ["Venus", "Merkurius", "Mars", "Bumi"],
+                answer: 1
+            },
+            {
+                q: "Mengapa Venus dijuluki sebagai planet terpanas meskipun bukan yang terdekat dari Matahari?",
+                options: ["Karena ada banyak gunung berapi aktif", "Karena atmosfernya memerangkap panas lewat efek rumah kaca", "Karena jaraknya sangat dekat dengan bintang lain", "Karena permukaannya dipenuhi lahar"],
+                answer: 1
+            },
+            {
+                q: "Planet apa yang terkenal dengan cincin es spektakuler di sekelilingnya?",
+                options: ["Yupiter", "Uranus", "Saturnus", "Neptunus"],
+                answer: 2
+            },
+            {
+                q: "Apa sebutan bagi Mars karena kenampakan permukaannya yang berwarna merah kemerahan?",
+                options: ["Planet Merah", "Planet Besi", "Planet Batu Bara", "Planet Api"],
+                answer: 0
+            },
+            {
+                q: "Pusat dari sistem tata surya tempat semua planet beredar mengitarinya adalah...",
+                options: ["Bulan", "Bumi", "Matahari", "Asteroid"],
+                answer: 2
+            }
+        ];
+
+        let currentQuizIndex = 0;
+
+        function startQuiz() {
+            currentQuizIndex = 0;
+            score = 0;
+            lives = 3;
+            updateHUD();
+            switchScreen('screenQuiz');
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            if (currentQuizIndex >= quizQuestions.length) {
+                endGame(true);
+                return;
+            }
+
+            document.getElementById('currentQuestionNum').innerText = currentQuizIndex + 1;
+            const qData = quizQuestions[currentQuizIndex];
+            document.getElementById('quizQuestionText').innerText = qData.q;
+            document.getElementById('quizFeedback').classList.add('hidden');
+
+            const container = document.getElementById('quizOptionsContainer');
+            container.innerHTML = '';
+
+            qData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "pixel-button bg-slate-700 hover:bg-slate-600 text-white p-3 text-xs text-left font-semibold flex items-center gap-3";
+                btn.innerHTML = `<span class="bg-slate-800 px-2 py-1 text-amber-400 font-bold">${String.fromCharCode(65 + idx)}</span> ${opt}`;
+                btn.onclick = () => answerQuiz(idx);
+                container.appendChild(btn);
+            });
+        }
+
+        function answerQuiz(selectedIndex) {
+            const qData = quizQuestions[currentQuizIndex];
+            const feedback = document.getElementById('quizFeedback');
+            feedback.classList.remove('hidden');
+
+            if (selectedIndex === qData.answer) {
+                playSound('correct');
+                score += 20;
+                updateHUD();
+                feedback.className = "p-3 text-xs font-bold text-center pixel-box bg-emerald-900/80 text-emerald-300 border-emerald-500";
+                feedback.innerText = "✨ BENAR! Hebat sekali penjelajah!";
+            } else {
+                playSound('wrong');
+                lives--;
+                updateHUD();
+                feedback.className = "p-3 text-xs font-bold text-center pixel-box bg-red-900/80 text-red-300 border-red-500";
+                feedback.innerText = `❌ SALAH! Jawaban yang benar adalah: ${qData.options[qData.answer]}`;
+
+                if (lives <= 0) {
+                    setTimeout(() => endGame(false), 1500);
+                    return;
+                }
+            }
+
+            currentQuizIndex++;
+            setTimeout(() => {
+                if (lives > 0) loadQuizQuestion();
+            }, 1800);
+        }
+
+        // --- MINI-GAME ORBIT ORDER ---
+        const correctOrbit = ["Merkurius", "Venus", "Bumi", "Mars", "Yupiter", "Saturnus", "Uranus", "Neptunus"];
+        let shuffledOrbit = [];
+
+        function startMiniGame() {
+            shuffledOrbit = [...correctOrbit].sort(() => Math.random() - 0.5);
+            renderOrbitList();
+            document.getElementById('orbitFeedback').classList.add('hidden');
+            switchScreen('screenMiniGame');
+        }
+
+        function renderOrbitList() {
+            const container = document.getElementById('orbitList');
+            container.innerHTML = '';
+            shuffledOrbit.forEach((planet, idx) => {
+                const item = document.createElement('div');
+                item.className = "bg-slate-900 p-3 pixel-box flex justify-between items-center text-xs font-bold";
+                item.innerHTML = `
+                    <span>📍 Urutan #${idx + 1}: <span class="text-cyan-300">${planet}</span></span>
+                    <div class="flex gap-1">
+                        <button onclick="movePlanet(${idx}, -1)" class="bg-slate-700 hover:bg-slate-600 px-2 py-1 pixel-button">⬆️</button>
+                        <button onclick="movePlanet(${idx}, 1)" class="bg-slate-700 hover:bg-slate-600 px-2 py-1 pixel-button">⬇️</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function movePlanet(index, direction) {
+            playSound('click');
+            const newIndex = index + direction;
+            if (newIndex >= 0 && newIndex < shuffledOrbit.length) {
+                const temp = shuffledOrbit[index];
+                shuffledOrbit[index] = shuffledOrbit[newIndex];
+                shuffledOrbit[newIndex] = temp;
+                renderOrbitList();
+            }
+        }
+
+        function checkOrbitOrder() {
+            let isCorrect = true;
+            for (let i = 0; i < correctOrbit.length; i++) {
+                if (shuffledOrbit[i] !== correctOrbit[i]) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+
+            const feedback = document.getElementById('orbitFeedback');
+            feedback.classList.remove('hidden');
+
+            if (isCorrect) {
+                playSound('correct');
+                score += 50;
+                updateHUD();
+                feedback.className = "text-xs text-center font-bold p-2 bg-emerald-900/80 text-emerald-300 pixel-box";
+                feedback.innerText = "🎉 Luar biasa! Urutan orbit planet dari Matahari sudah tepat!";
+                setTimeout(() => endGame(true), 2000);
+            } else {
+                playSound('wrong');
+                feedback.className = "text-xs text-center font-bold p-2 bg-red-900/80 text-red-300 pixel-box";
+                feedback.innerText = "❌ Urutan belum tepat. Ingat: Merkurius paling dekat, Neptunus paling jauh!";
+            }
+        }
+
+        // --- END GAME RESULT ---
+        function endGame(isVictory) {
+            switchScreen('screenResult');
+            document.getElementById('finalScore').innerText = score;
+            const emoji = document.getElementById('resultEmoji');
+            const title = document.getElementById('resultTitle');
+            const desc = document.getElementById('resultDesc');
+
+            if (isVictory) {
+                emoji.innerText = "🏆";
+                title.innerText = "MISI SUKSES BERHASIL!";
+                desc.innerText = "Kamu adalah astronot Minecraft paling cerdas! Seluruh materi IPAS Tata Surya telah kamu kuasai dengan gemilang.";
+            } else {
+                emoji.innerText = "💀";
+                title.innerText = "MISI GAGAL (GAME OVER)";
+                desc.innerText = "Nyawamu habis di luar angkasa. Jangan menyerah, ayo pelajari lagi planet-planet di mode eksplorasi!";
+            }
+        }
+    </script>
+</body>
+</html>
